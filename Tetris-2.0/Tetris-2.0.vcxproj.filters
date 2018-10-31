@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Src">
+      <UniqueIdentifier>{feab1380-8a42-4e4b-8494-d4af2275f1c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine">
+      <UniqueIdentifier>{655d5a9c-0066-4945-a90d-7e68f5db5133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Menus">
+      <UniqueIdentifier>{04987e5f-51d3-4975-a0e3-cbacd5cb665e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="block.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="hennypenny-regular.ttf">
+      <Filter>Fichiers de ressources</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="tetris.ogg">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Game.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\main.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Engine\GameEngine.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Engine\Piece.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Menus\AbstractMenu.cpp">
+      <Filter>Src\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Menus\MainMenu.cpp">
+      <Filter>Src\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Menus\OptionsMenu.cpp">
+      <Filter>Src\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Menus\PauseMenu.cpp">
+      <Filter>Src\Menus</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Menus\GameOverMenu.cpp">
+      <Filter>Src\Menus</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Game.hpp">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\main.hpp">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Engine\GameEngine.hpp">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Engine\Piece.hpp">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Menus\AbstractMenu.hpp">
+      <Filter>Src\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Menus\MainMenu.hpp">
+      <Filter>Src\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Menus\OptionsMenu.hpp">
+      <Filter>Src\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Menus\PauseMenu.hpp">
+      <Filter>Src\Menus</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Menus\GameOverMenu.hpp">
+      <Filter>Src\Menus</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
