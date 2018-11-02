@@ -1,21 +1,23 @@
 #include "Piece.hpp"
 
+const sf::Uint8 ALPHA = sf::Uint8(128);
+
 sf::Color Piece::getColorByBlockType(BlockType const& type) {
 	switch (type) {
 	case BlockType::Cube:
-		return sf::Color(55, 85, 255);
+		return sf::Color(55, 85, 255, ALPHA);
 	case BlockType::Line:
-		return sf::Color(230, 65, 170);
+		return sf::Color(230, 65, 170, ALPHA);
 	case BlockType::T:
-		return sf::Color(225, 230, 25);
+		return sf::Color(225, 230, 25, ALPHA);
 	case BlockType::L:
-		return sf::Color(255, 15, 50);
+		return sf::Color(255, 15, 50, ALPHA);
 	case BlockType::ReversedL:
-		return sf::Color(80, 255, 30);
+		return sf::Color(80, 255, 30, ALPHA);
 	case BlockType::Stairs:
-		return sf::Color(15, 205, 235);
+		return sf::Color(15, 205, 235, ALPHA);
 	case BlockType::ReversedStairs:
-		return sf::Color(255, 170, 5);
+		return sf::Color(255, 170, 5, ALPHA);
 	default:
 		return sf::Color::Transparent;
 	}

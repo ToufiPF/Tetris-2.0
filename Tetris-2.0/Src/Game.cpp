@@ -9,6 +9,7 @@ const float Game::DEFAULT_BGM_VOLUME = 100.0f;
 const float Game::DEFAULT_SFX_VOLUME = 100.0f;
 
 const int Game::DEFAULT_DIFFICULTY = 3;
+const sf::Time Game::DEFAULT_KEY_REPEAT_TIME = sf::microseconds(200);
 
 using std::ofstream;
 using std::ifstream;
@@ -77,32 +78,11 @@ Game::ErrorCode Game::init() {
 	else
 		return ErrorCode::NO_ERROR;
 }
-void Game::loop() {
-	sf::Event e;
+
+void Game::begin() {
 	while (mWin->isOpen()) {
-		while (mWin->pollEvent(e)) {
-			switch (e.type)
-			{
-			case sf::Event::EventType::Closed:
-				close();
-				break;
-
-			case sf::Event::EventType::LostFocus:
-				break;
-			case sf::Event::EventType::GainedFocus:
-				break;
-
-			case sf::Event::EventType::KeyPressed:
-				processKeyEvents(e);
-				break;
-			case sf::Event::EventType::KeyReleased:
-				processKeyEvents(e);
-				break;
-
-			default:
-				break;
-			}
-		}
+		// On gere les events
+		processEvents();
 
 		sf::Time elapsed = mClockGame.restart();
 		mWin->clear(sf::Color::White);
@@ -121,6 +101,9 @@ void Game::loop() {
 		case GameState::PLAYING:
 			mGE.updateGame(elapsed);
 			mWin->draw(mGE);
+
+			if (mGE.isGameOver())
+				setGameState(GameState::GAME_OVER);
 
 			break;
 
@@ -244,8 +227,18 @@ bool Game::readSettings() {
 
 void Game::setGameState(const GameState &state)
 {
-	mGameState = state;
 	switch (state) {
+	case GameState::MAIN_MENU:
+		if (mGameState != GameState::OPTIONS_MENU)
+			mMainMenu.setSelection(0);
+
+		// Si on retourne au menu depuis l'ecran pause ou apres un game-over, on reinitialise le game engine
+		if (mGameState == GameState::PAUSED || mGameState == GameState::GAME_OVER)
+			mGE.init(&mBlockTexture, DEFAULT_KEY_REPEAT_TIME);
+		break;
+	case GameState::OPTIONS_MENU:
+		mOptionsMenu.setSelection(0);
+		break;
 	case GameState::PLAYING:
 		break;
 	case GameState::PAUSED:
@@ -254,8 +247,36 @@ void Game::setGameState(const GameState &state)
 	default:
 		break;
 	}
+	mGameState = state;
 }
 
+void Game::processEvents() {
+	sf::Event e;
+
+	while (mWin->pollEvent(e)) {
+		switch (e.type)
+		{
+		case sf::Event::EventType::Closed:
+			close();
+			break;
+
+		case sf::Event::EventType::LostFocus:
+			break;
+		case sf::Event::EventType::GainedFocus:
+			break;
+
+		case sf::Event::EventType::KeyPressed:
+			processKeyEvents(e);
+			break;
+		case sf::Event::EventType::KeyReleased:
+			processKeyEvents(e);
+			break;
+
+		default:
+			break;
+		}
+	}
+}
 void Game::processKeyEvents(const sf::Event &e) {
 	if (mGameState == GameState::MAIN_MENU) {
 		if (e.type != sf::Event::EventType::KeyPressed)
@@ -385,11 +406,10 @@ void Game::processKeyEvents(const sf::Event &e) {
 		}
 	}
 	else if (mGameState == GameState::PLAYING) {
-		mGE.processKeyEvent(e);
-
 		if (e.type == sf::Event::EventType::KeyReleased && e.key.code == sf::Keyboard::Escape) {
 			setGameState(GameState::PAUSED);
 		}
+		mGE.processKeyEvent(e);
 	}
 	else if (mGameState == GameState::PAUSED) {
 		if (e.type == sf::Event::EventType::KeyPressed) {

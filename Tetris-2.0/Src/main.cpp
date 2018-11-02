@@ -32,7 +32,7 @@ int main()
 		return Game::ErrorCode::UNKNOWN;
 	}
 
-	game.loop();
+	game.begin();
 
 	return 0;
 }

@@ -32,6 +32,8 @@ public:
 
 	static const int DEFAULT_DIFFICULTY;
 
+	static const sf::Time DEFAULT_KEY_REPEAT_TIME;
+
 public:
 	Game(sf::RenderWindow *window = nullptr);
 	~Game();
@@ -40,7 +42,7 @@ public:
 	ErrorCode init();
 
 	// Lance la boucle du menu
-	void loop();
+	void begin();
 
 	// Ferme la fenetre et sauvegarde
 	void close();
@@ -53,6 +55,8 @@ protected:
 	// Change l'etat du jeu : mainMenu, optionsMenu, playing, paused, gameOver
 	void setGameState(const GameState &state);
 
+	// Gere les events
+	void processEvents();
 	// Gere les events claviers selon l'etat du jeu
 	void processKeyEvents(const sf::Event &e);
 

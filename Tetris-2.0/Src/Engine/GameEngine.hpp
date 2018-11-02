@@ -14,7 +14,7 @@ public:
 	GameEngine();
 	~GameEngine();
 
-	bool init(sf::Texture *textureBlock);
+	bool init(sf::Texture *textureBlock, sf::Time keyRepeatTime);
 
 	void updateGame(sf::Time const& elapsed);
 	void processKeyEvent(sf::Event const& e);
@@ -32,6 +32,9 @@ public:
 	unsigned long int getScore() const { return mScore; };
 	bool isGameOver() const { return mIsGameOver; };
 
+	void setKeyRepeatTime(sf::Time const& time) { mKeyRepeatTime = time; }
+	sf::Time getKeyRepeatTime() { return mKeyRepeatTime; }
+
 protected:
 	sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
 	// Donne la couleur au vertexArray
@@ -48,14 +51,17 @@ protected:
 	// Renvoie false si game over
 	bool generateNextBlock();
 
-	bool isMoveLeftAllowed(vector<sf::Vector2i> const& tiles) const;
-	bool isMoveRightAllowed(vector<sf::Vector2i> const& tiles) const;
-	bool isMoveDownAllowed(vector<sf::Vector2i> const& tiles) const;
+	bool isMoveLeftAllowed(Piece *piece) const;
+	bool isMoveRightAllowed(Piece *piece) const;
+	bool isMoveDownAllowed(Piece *piece) const;
+
+	void rotateLeftIfAllowed(Piece *piece);
+	void rotateRightIfAllowed(Piece *piece);
 
 protected:
 	sf::Vector2u mSize;
 
-	vector< vector< Piece::BlockType> > mTileMap;
+	vector< vector< Piece::BlockType > > mTileMap;
 	sf::VertexArray mVArray;
 	Piece *mActivePiece;
 	Piece *mNextPiece;
@@ -66,6 +72,8 @@ protected:
 	int mDifficulty;
 	sf::Time mFrameTime, mElapsedSinceLastFrame;
 	sf::Time mElapsedTotal;
+
+	sf::Time mKeyRepeatTime;
 
 	bool mIsGameOver;
 
