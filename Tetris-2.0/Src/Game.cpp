@@ -9,7 +9,6 @@ const float Game::DEFAULT_BGM_VOLUME = 100.0f;
 const float Game::DEFAULT_SFX_VOLUME = 100.0f;
 
 const int Game::DEFAULT_DIFFICULTY = 3;
-const sf::Time Game::DEFAULT_KEY_REPEAT_TIME = sf::microseconds(200);
 
 using std::ofstream;
 using std::ifstream;
@@ -44,7 +43,7 @@ Game::ErrorCode Game::init() {
 	mWin->create(sf::VideoMode(mWinSize.x, mWinSize.y), "Tetris 2.0", sf::Style::Titlebar | sf::Style::Close, settings);
 	mWin->setFramerateLimit(60);
 	mWin->setVerticalSyncEnabled(false);
-	mWin->setKeyRepeatEnabled(false);
+	mWin->setKeyRepeatEnabled(true);
 
 	mTetrisTheme.setLoop(true);
 	mTetrisTheme.setVolume(mBgmVolume);
@@ -236,7 +235,7 @@ void Game::setGameState(const GameState &state)
 	case GameState::PLAYING:
 		// Si on vient de lancer le jeu, on reinitiallise le gameEngine
 		if (mGameState == GameState::MAIN_MENU)
-			mGE.init(&mBlockTexture, DEFAULT_KEY_REPEAT_TIME);
+			mGE.init(&mBlockTexture);
 		break;
 	case GameState::PAUSED:
 		mPauseMenu.setSelection(0);

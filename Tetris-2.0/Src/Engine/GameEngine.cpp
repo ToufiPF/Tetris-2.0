@@ -18,12 +18,11 @@ GameEngine::GameEngine()
 }
 GameEngine::~GameEngine() {
 }
-bool GameEngine::init(sf::Texture *textureBlock, sf::Time keyRepeatTime) {
+bool GameEngine::init(sf::Texture *textureBlock) {
 	if (textureBlock == nullptr)
 		return false;
 
 	mTextureBlock = textureBlock;
-	mKeyRepeatTime = keyRepeatTime;
 
 	srand((unsigned int)time(nullptr));
 
@@ -166,7 +165,10 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 	mElapsedSinceLastFrame += elapsed;
 	mElapsedTotal += elapsed;
 
-	mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty);
+	if (mAccelerateDown)
+		mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty) / sf::Int64(2);
+	else
+		mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty);
 
 	// On descend d'une case tous les ticks
 	if (mElapsedSinceLastFrame > mFrameTime) {
@@ -359,7 +361,7 @@ void GameEngine::rotateRightIfAllowed(Piece *piece) {
 }
 
 sf::Time GameEngine::computeFrameTime(sf::Time elapsedTotal, int difficulty) {
-	float limFrame = 100 + (10 - difficulty) * 15;
+	float limFrame = 100.0f + (10 - difficulty) * 15;
 
 	double frameTime = limFrame + (limFrame + (10 - difficulty) * 20) * std::exp(-2 * (difficulty + 3) / 2000.0 * mElapsedTotal.asSeconds());
 

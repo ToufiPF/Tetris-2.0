@@ -32,8 +32,6 @@ public:
 
 	static const int DEFAULT_DIFFICULTY;
 
-	static const sf::Time DEFAULT_KEY_REPEAT_TIME;
-
 public:
 	Game(sf::RenderWindow *window = nullptr);
 	~Game();

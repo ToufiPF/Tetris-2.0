@@ -14,7 +14,7 @@ public:
 	GameEngine();
 	~GameEngine();
 
-	bool init(sf::Texture *textureBlock, sf::Time keyRepeatTime);
+	bool init(sf::Texture *textureBlock);
 
 	void updateGame(sf::Time const& elapsed);
 	void processKeyEvent(sf::Event const& e);
@@ -32,9 +32,6 @@ public:
 	unsigned long int getScore() const { return mScore; };
 	bool isGameOver() const { return mIsGameOver; };
 
-	void setKeyRepeatTime(sf::Time const& time) { mKeyRepeatTime = time; }
-	sf::Time getKeyRepeatTime() { return mKeyRepeatTime; }
-
 protected:
 	sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
 	// Donne la couleur au vertexArray
@@ -45,6 +42,7 @@ protected:
 	// Dessine le vertexArray
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+	// Efface les rows fournies, et decale le niveau vers le bas
 	void clearCompletedRows(vector<int> &rowsToClear);
 
 	// Genere un nouveau block actif
@@ -73,8 +71,6 @@ protected:
 	sf::Time mFrameTime;
 	sf::Time mElapsedSinceLastFrame;
 	sf::Time mElapsedTotal;
-
-	sf::Time mKeyRepeatTime;
 
 	bool mIsGameOver;
 
