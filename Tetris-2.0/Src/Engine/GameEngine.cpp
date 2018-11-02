@@ -140,26 +140,34 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 
 	vector<sf::Vector2i> tilesBl(mActivePiece->getTilesGlobalCoords());
 
-	if (mStrafeLeft) {
-		mStrafeLeft = false;
-
-		if (isMoveLeftAllowed(mActivePiece))
-			mActivePiece->move(-1, 0);
+	if (mInstantDown) {
+		while (isMoveDownAllowed(mActivePiece)) {
+			mActivePiece->move(0, 1);
+		}
+		mInstantDown = false;
 	}
-	else if (mStrafeRight) {
-		mStrafeRight = false;
+	else {
+		if (mStrafeLeft) {
+			mStrafeLeft = false;
 
-		if (isMoveRightAllowed(mActivePiece))
-			mActivePiece->move(1, 0);
-	}
+			if (isMoveLeftAllowed(mActivePiece))
+				mActivePiece->move(-1, 0);
+		}
+		else if (mStrafeRight) {
+			mStrafeRight = false;
 
-	if (mRotateLeft) {
-		mRotateLeft = false;
-		rotateLeftIfAllowed(mActivePiece);
-	}
-	else if (mRotateRight) {
-		mRotateRight = false;
-		rotateRightIfAllowed(mActivePiece);
+			if (isMoveRightAllowed(mActivePiece))
+				mActivePiece->move(1, 0);
+		}
+
+		if (mRotateLeft) {
+			mRotateLeft = false;
+			rotateLeftIfAllowed(mActivePiece);
+		}
+		else if (mRotateRight) {
+			mRotateRight = false;
+			rotateRightIfAllowed(mActivePiece);
+		}
 	}
 
 	mElapsedSinceLastFrame += elapsed;
