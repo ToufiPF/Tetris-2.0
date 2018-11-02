@@ -33,7 +33,7 @@ public:
 	bool isGameOver() const { return mIsGameOver; };
 
 protected:
-	sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
+	static sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
 	// Donne la couleur au vertexArray
 	void paintLevel();
 	// Donne la couleur a la piece active
@@ -42,6 +42,7 @@ protected:
 	// Dessine le vertexArray
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+	void onActivePieceHitBottom();
 	// Efface les rows fournies, et decale le niveau vers le bas
 	void clearCompletedRows(vector<int> &rowsToClear);
 

@@ -138,97 +138,101 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 	if (mActivePiece == nullptr)
 		return;
 
-	vector<sf::Vector2i> tilesBl(mActivePiece->getTilesGlobalCoords());
+	mElapsedSinceLastFrame += elapsed;
+	mElapsedTotal += elapsed;
 
 	if (mInstantDown) {
 		while (isMoveDownAllowed(mActivePiece)) {
 			mActivePiece->move(0, 1);
 		}
 		mInstantDown = false;
+		onActivePieceHitBottom();
 	}
 	else {
 		if (mStrafeLeft) {
-			mStrafeLeft = false;
-
-			if (isMoveLeftAllowed(mActivePiece))
+			if (isMoveLeftAllowed(mActivePiece)) {
 				mActivePiece->move(-1, 0);
+				mStrafeLeft = false;
+			}
 		}
 		else if (mStrafeRight) {
-			mStrafeRight = false;
-
-			if (isMoveRightAllowed(mActivePiece))
+			if (isMoveRightAllowed(mActivePiece)) {
 				mActivePiece->move(1, 0);
+				mStrafeRight = false;
+			}
 		}
 
 		if (mRotateLeft) {
-			mRotateLeft = false;
 			rotateLeftIfAllowed(mActivePiece);
 		}
 		else if (mRotateRight) {
-			mRotateRight = false;
 			rotateRightIfAllowed(mActivePiece);
 		}
-	}
 
-	mElapsedSinceLastFrame += elapsed;
-	mElapsedTotal += elapsed;
+		if (mAccelerateDown)
+			mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty) / sf::Int64(2);
+		else
+			mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty);
 
-	if (mAccelerateDown)
-		mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty) / sf::Int64(2);
-	else
-		mFrameTime = computeFrameTime(mElapsedTotal, mDifficulty);
+		// On descend d'une case tous les ticks
+		if (mElapsedSinceLastFrame > mFrameTime) {
+			mElapsedSinceLastFrame = mElapsedSinceLastFrame % mFrameTime;
 
-	// On descend d'une case tous les ticks
-	if (mElapsedSinceLastFrame > mFrameTime) {
-		mElapsedSinceLastFrame = mElapsedSinceLastFrame % mFrameTime;
-
-		tilesBl = mActivePiece->getTilesGlobalCoords();
-
-		// On vérifie si on peut descendre
-		if (isMoveDownAllowed(mActivePiece)) {
-			mActivePiece->move(0, 1);
-		}
-		else {
-			std::set<int> listRows;
-			vector<int> rowsToClear;
-
-			// Si non, on écrit le bloc actif dans le level
-			for (unsigned int i = 0; i < tilesBl.size(); i++) {
-				mTileMap[tilesBl.at(i).x][tilesBl.at(i).y] = mActivePiece->getBlockType();
-
-				listRows.insert(tilesBl.at(i).y);
-			}
-
-			// on vérifie si des lignes sont completes, en partant du bas.
-			bool voidTileFound;
-			for (std::set<int>::reverse_iterator it = listRows.rbegin(); it != listRows.rend(); it++) {
-				voidTileFound = false;
-				for (int x = 0; x < COUNT_TILES_WIDTH; x++) {
-					if (mTileMap.at(x).at(*it) == Piece::BlockType::Void) {
-						voidTileFound = true;
-						break;
-					}
-				}
-				if (!voidTileFound)
-					rowsToClear.push_back(*it);
-			}
-
-			// on nettoie les lignes completes
-			clearCompletedRows(rowsToClear);
-
-			// et on charge un nouveau bloc
-			if (!generateNextBlock()) {
-				//generateNewBlock renvoie false : c'est game over
-				cout << endl << "FIN DU JEU" << endl;
-				mIsGameOver = true;
-			}
+			// On vérifie si on peut descendre
+			if (isMoveDownAllowed(mActivePiece))
+				mActivePiece->move(0, 1);
+			else
+				onActivePieceHitBottom();
 		}
 	}
+
 	paintLevel();
 	paintActivePiece();
 }
 
+void GameEngine::onActivePieceHitBottom() {
+	vector<sf::Vector2i> tilesBl(mActivePiece->getTilesGlobalCoords());
+
+	std::set<int> listRows;
+	vector<int> rowsToClear;
+
+	// on écrit le bloc actif dans le level
+	for (unsigned int i = 0; i < tilesBl.size(); i++) {
+		mTileMap[tilesBl.at(i).x][tilesBl.at(i).y] = mActivePiece->getBlockType();
+
+		listRows.insert(tilesBl.at(i).y);
+	}
+
+	// on vérifie si des lignes sont completes, en partant du bas.
+	bool voidTileFound;
+	for (std::set<int>::reverse_iterator it = listRows.rbegin(); it != listRows.rend(); it++) {
+		voidTileFound = false;
+		for (int x = 0; x < COUNT_TILES_WIDTH; x++) {
+			if (mTileMap.at(x).at(*it) == Piece::BlockType::Void) {
+				voidTileFound = true;
+				break;
+			}
+		}
+		if (!voidTileFound)
+			rowsToClear.push_back(*it);
+	}
+
+	// on nettoie les lignes completes
+	clearCompletedRows(rowsToClear);
+
+	// et on charge un nouveau bloc
+	if (!generateNextBlock()) {
+		//generateNewBlock renvoie false : c'est game over
+		cout << endl << "FIN DU JEU" << endl;
+		mIsGameOver = true;
+
+		mScore *= mDifficulty;
+	}
+}
+
 void GameEngine::clearCompletedRows(vector<int> &rowsToClear) {
+	mScore += 100 * rowsToClear.size() * rowsToClear.size();
+
 	for (unsigned int i = 0; i < rowsToClear.size(); i++) {
 		// on remplace les lignes inferieures par celles superieures
 		for (int x = 0; x < COUNT_TILES_WIDTH; x++) {
@@ -275,6 +279,7 @@ bool GameEngine::generateNextBlock() {
 		if (mTileMap.at(mActivePiece->getTilesGlobalCoords().at(i).x).at(mActivePiece->getTilesGlobalCoords().at(i).y) != Piece::BlockType::Void)
 			return false;
 
+	mScore += 10;
 	return true;
 }
 
@@ -340,6 +345,8 @@ void GameEngine::rotateLeftIfAllowed(Piece *piece) {
 	}
 	if (cancelRot)
 		piece->rotateRight();
+	else
+		mRotateLeft = false;
 }
 void GameEngine::rotateRightIfAllowed(Piece *piece) {
 	bool cancelRot = false;
@@ -366,14 +373,15 @@ void GameEngine::rotateRightIfAllowed(Piece *piece) {
 	}
 	if (cancelRot)
 		mActivePiece->rotateLeft();
+	else
+		mRotateRight = false;
 }
 
 sf::Time GameEngine::computeFrameTime(sf::Time elapsedTotal, int difficulty) {
-	float limFrame = 100.0f + (10 - difficulty) * 15;
+	float limFrame = 100.0f;
 
-	double frameTime = limFrame + (limFrame + (10 - difficulty) * 20) * std::exp(-2 * (difficulty + 3) / 2000.0 * mElapsedTotal.asSeconds());
-
-	//cout << "Limite frame : " << limFrame << ", frameTime : " << frameTime << endl;
+	double frameTime = limFrame + (limFrame + (15 - difficulty) * 20) * std::exp(-(difficulty + 10) / 2000.0f * elapsedTotal.asSeconds());
+	cout << "Temps computed : " << frameTime << endl;
 	return sf::microseconds((sf::Int64) (1000 * frameTime));
 }
 

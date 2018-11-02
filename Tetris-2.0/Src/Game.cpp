@@ -109,7 +109,7 @@ void Game::begin() {
 			// Permet de voir le jeu en transparence
 			mWin->draw(mGE);
 			fond.setSize(sf::Vector2f((float)mWinSize.x, (float)mWinSize.y));
-			fond.setFillColor(sf::Color(0, 0, 0, 100));
+			fond.setFillColor(sf::Color(0, 0, 0, 150));
 			mWin->draw(fond);
 
 			mWin->draw(mPauseMenu);
@@ -239,6 +239,9 @@ void Game::setGameState(const GameState &state)
 		break;
 	case GameState::PAUSED:
 		mPauseMenu.setSelection(0);
+		break;
+	case GameState::GAME_OVER:
+		mGameOverMenu.setScore(mGE.getScore());
 		break;
 	default:
 		break;
@@ -445,6 +448,9 @@ void Game::processKeyEvents(const sf::Event &e) {
 		}
 	}
 	else if (mGameState == GameState::GAME_OVER) {
-		mGameOverMenu.setScore(mGE.getScore());
+		if (e.type == sf::Event::KeyPressed) {
+			if (e.key.code == sf::Keyboard::Escape || e.key.code == sf::Keyboard::Return || e.key.code == sf::Keyboard::Space)
+				setGameState(GameState::MAIN_MENU);
+		}
 	}
 }

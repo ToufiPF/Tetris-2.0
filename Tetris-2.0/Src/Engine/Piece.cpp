@@ -1,6 +1,6 @@
 #include "Piece.hpp"
 
-const sf::Uint8 ALPHA = sf::Uint8(128);
+const sf::Uint8 ALPHA = sf::Uint8(200);
 
 sf::Color Piece::getColorByBlockType(BlockType const& type) {
 	switch (type) {
