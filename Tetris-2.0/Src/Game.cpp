@@ -71,7 +71,6 @@ Game::ErrorCode Game::init() {
 	mGameOverMenu.setSelection(0);
 
 	setGameState(GameState::MAIN_MENU);
-	mGE.init(&mBlockTexture);
 
 	if (!settingsRead)
 		return ErrorCode::MISS_SETTINGS_INI;
@@ -231,15 +230,13 @@ void Game::setGameState(const GameState &state)
 	case GameState::MAIN_MENU:
 		if (mGameState != GameState::OPTIONS_MENU)
 			mMainMenu.setSelection(0);
-
-		// Si on retourne au menu depuis l'ecran pause ou apres un game-over, on reinitialise le game engine
-		if (mGameState == GameState::PAUSED || mGameState == GameState::GAME_OVER)
-			mGE.init(&mBlockTexture, DEFAULT_KEY_REPEAT_TIME);
-		break;
 	case GameState::OPTIONS_MENU:
 		mOptionsMenu.setSelection(0);
 		break;
 	case GameState::PLAYING:
+		// Si on vient de lancer le jeu, on reinitiallise le gameEngine
+		if (mGameState == GameState::MAIN_MENU)
+			mGE.init(&mBlockTexture, DEFAULT_KEY_REPEAT_TIME);
 		break;
 	case GameState::PAUSED:
 		mPauseMenu.setSelection(0);

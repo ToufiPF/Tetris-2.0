@@ -70,7 +70,8 @@ protected:
 
 	unsigned long int mScore;
 	int mDifficulty;
-	sf::Time mFrameTime, mElapsedSinceLastFrame;
+	sf::Time mFrameTime;
+	sf::Time mElapsedSinceLastFrame;
 	sf::Time mElapsedTotal;
 
 	sf::Time mKeyRepeatTime;

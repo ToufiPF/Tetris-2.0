@@ -22,6 +22,9 @@ bool GameEngine::init(sf::Texture *textureBlock, sf::Time keyRepeatTime) {
 	if (textureBlock == nullptr)
 		return false;
 
+	mTextureBlock = textureBlock;
+	mKeyRepeatTime = keyRepeatTime;
+
 	srand((unsigned int)time(nullptr));
 
 	mScore = 0;
@@ -33,8 +36,6 @@ bool GameEngine::init(sf::Texture *textureBlock, sf::Time keyRepeatTime) {
 
 	mElapsedSinceLastFrame = sf::Time::Zero;
 	mElapsedTotal = sf::Time::Zero;
-
-	mKeyRepeatTime = keyRepeatTime;
 
 	mTileMap.resize(COUNT_TILES_WIDTH);
 	for (unsigned int i = 0; i < mTileMap.size(); ++i)
