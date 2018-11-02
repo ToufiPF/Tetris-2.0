@@ -1,9 +1,7 @@
 #include "Game.hpp"
 
-const unsigned int Game::DEFAULT_WIN_SIZE_X = 720U;
-const unsigned int Game::DEFAULT_WIN_SIZE_Y = 1024U;
-const float Game::DEFAULT_GAMEENGINE_RATIO_X = 1.0f;
-const float Game::DEFAULT_GAMEENGINE_RATIO_Y = 1.0f;
+const unsigned int Game::MINIMUM_WIN_SIZE_X = (unsigned int)GameEngine::getLocalSize().x + 150;
+const unsigned int Game::MINIMUM_WIN_SIZE_Y = (unsigned int)GameEngine::getLocalSize().y;
 
 const float Game::DEFAULT_BGM_VOLUME = 100.0f;
 const float Game::DEFAULT_SFX_VOLUME = 100.0f;
@@ -35,38 +33,40 @@ Game::ErrorCode Game::init() {
 	if (!mBlockTexture.loadFromFile("block.png"))
 		return ErrorCode::MISS_BLOCK_TEXTURE;
 
-	bool settingsRead = readSettings();
-
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
-	mWin->create(sf::VideoMode(mWinSize.x, mWinSize.y), "Tetris 2.0", sf::Style::Titlebar | sf::Style::Close, settings);
+	mWin->create(sf::VideoMode(MINIMUM_WIN_SIZE_X, MINIMUM_WIN_SIZE_X), "Tetris 2.0", sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close, settings);
 	mWin->setFramerateLimit(60);
 	mWin->setVerticalSyncEnabled(false);
 	mWin->setKeyRepeatEnabled(true);
+
+	bool settingsRead = readSettings();
+
+	mWin->setPosition(sf::Vector2i(400, 200));
 
 	mTetrisTheme.setLoop(true);
 	mTetrisTheme.setVolume(mBgmVolume);
 	mTetrisTheme.play();
 
 	mMainMenu.setFont(mHpFont);
-	mMainMenu.setMenuSize(sf::Vector2f((float)mWinSize.x, (float)mWinSize.y));
+	mMainMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
 	mMainMenu.setSelection(0);
 
 	mOptionsMenu.setFont(mHpFont);
-	mOptionsMenu.setMenuSize(sf::Vector2f((float)mWinSize.x, (float)mWinSize.y));
+	mOptionsMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
 	mOptionsMenu.setSelection(0);
 	mOptionsMenu.setDifficultyValue(mGE.getDifficulty());
 	mOptionsMenu.setBgmVolumeValue(mBgmVolume);
 	mOptionsMenu.setSfxVolumeValue(mSfxVolume);
 
 	mPauseMenu.setFont(mHpFont);
-	mPauseMenu.setMenuSize(sf::Vector2f((float)mWinSize.x / 1.5f, (float)mWinSize.y / 1.5f));
+	mPauseMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x / 1.5f, (float)mWin->getSize().y / 1.5f));
 	mPauseMenu.setSelection(0);
-	mPauseMenu.setPosition(mWinSize.x / 6.0f, mWinSize.y / 6.0f);
+	mPauseMenu.setPosition(mWin->getSize().x / 6.0f, mWin->getSize().y / 6.0f);
 
 	mGameOverMenu.setFont(mHpFont);
-	mGameOverMenu.setMenuSize(sf::Vector2f((float)mWinSize.x, (float)mWinSize.y));
+	mGameOverMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
 	mGameOverMenu.setSelection(0);
 
 	setGameState(GameState::MAIN_MENU);
@@ -89,15 +89,18 @@ void Game::begin() {
 		// On dessine en fonction du GameState
 		switch (mGameState) {
 		case GameState::MAIN_MENU:
+			mWin->setView(mViewMenus);
 			mWin->draw(mMainMenu);
 			break;
 
 		case GameState::OPTIONS_MENU:
+			mWin->setView(mViewMenus);
 			mWin->draw(mOptionsMenu);
 			break;
 
 		case GameState::PLAYING:
 			mGE.updateGame(elapsed);
+			mWin->setView(mViewGE);
 			mWin->draw(mGE);
 
 			if (mGE.isGameOver())
@@ -107,8 +110,12 @@ void Game::begin() {
 
 		case GameState::PAUSED:
 			// Permet de voir le jeu en transparence
+			mWin->setView(mViewGE);
 			mWin->draw(mGE);
-			fond.setSize(sf::Vector2f((float)mWinSize.x, (float)mWinSize.y));
+
+			mWin->setView(mViewMenus);
+
+			fond.setSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
 			fond.setFillColor(sf::Color(0, 0, 0, 150));
 			mWin->draw(fond);
 
@@ -117,6 +124,7 @@ void Game::begin() {
 			break;
 
 		case GameState::GAME_OVER:
+			mWin->setView(mViewMenus);
 			mWin->draw(mGameOverMenu);
 			break;
 		default:
@@ -136,8 +144,7 @@ bool Game::writeSettings() const {
 	if (!os)
 		return false;
 
-	os << "winSize: " << mWinSize.x << " " << mWinSize.y << endl;
-	os << "gameEngineRatio: " << mGameEngineRatio.x << " " << mGameEngineRatio.y << endl;
+	os << "winSize: " << mWin->getSize().x << " " << mWin->getSize().y << endl;
 
 	os << "bgmVolume: " << mBgmVolume << endl;
 	os << "sfxVolume: " << mSfxVolume << endl;
@@ -150,12 +157,6 @@ bool Game::writeSettings() const {
 }
 bool Game::readSettings() {
 	// Parametres de base
-	mWinSize.x = DEFAULT_WIN_SIZE_X;
-	mWinSize.y = DEFAULT_WIN_SIZE_Y;
-
-	mGameEngineRatio.x = DEFAULT_GAMEENGINE_RATIO_X;
-	mGameEngineRatio.y = DEFAULT_GAMEENGINE_RATIO_Y;
-
 	mBgmVolume = DEFAULT_BGM_VOLUME;
 	mSfxVolume = DEFAULT_SFX_VOLUME;
 
@@ -172,19 +173,14 @@ bool Game::readSettings() {
 			ss >> buff;
 
 			if (buff == "winSize:") {
-				ss >> mWinSize.x >> mWinSize.y;
+				unsigned int winSizeX, winSizeY;
+				ss >> winSizeX >> winSizeY;
 				if (ss.fail()) {
 					cerr << "Failed to read : winSize" << endl;
-					mWinSize.x = DEFAULT_WIN_SIZE_X;
-					mWinSize.y = DEFAULT_WIN_SIZE_Y;
 				}
-			}
-			else if (buff == "gameEngineRatio:") {
-				ss >> mGameEngineRatio.x >> mGameEngineRatio.y;
-				if (ss.fail()) {
-					cerr << "Failed to read : gameEngineRatio" << endl;
-					mGameEngineRatio.x = DEFAULT_GAMEENGINE_RATIO_X;
-					mGameEngineRatio.y = DEFAULT_GAMEENGINE_RATIO_Y;
+				else {
+					mWin->setSize(sf::Vector2u(winSizeX, winSizeY));
+					resizeViews();
 				}
 			}
 			else if (buff == "bgmVolume:") {
@@ -229,6 +225,7 @@ void Game::setGameState(const GameState &state)
 	case GameState::MAIN_MENU:
 		if (mGameState != GameState::OPTIONS_MENU)
 			mMainMenu.setSelection(0);
+		break;
 	case GameState::OPTIONS_MENU:
 		mOptionsMenu.setSelection(0);
 		break;
@@ -257,6 +254,9 @@ void Game::processEvents() {
 		{
 		case sf::Event::EventType::Closed:
 			close();
+			break;
+		case sf::Event::EventType::Resized:
+			processResizeEvent(e);
 			break;
 
 		case sf::Event::EventType::LostFocus:
@@ -453,4 +453,35 @@ void Game::processKeyEvents(const sf::Event &e) {
 				setGameState(GameState::MAIN_MENU);
 		}
 	}
+}
+
+void Game::processResizeEvent(const sf::Event &e) {
+	if (e.type != sf::Event::EventType::Resized)
+		return;
+
+	unsigned int width = e.size.width;
+	if (width < MINIMUM_WIN_SIZE_X)
+		width = MINIMUM_WIN_SIZE_X;
+	unsigned int height = e.size.height;
+	if (height < MINIMUM_WIN_SIZE_Y)
+		height = MINIMUM_WIN_SIZE_Y;
+
+	mWin->setSize(sf::Vector2u(width, height));
+	resizeViews();
+	mClockGame.restart();
+}
+void Game::resizeViews() {
+	mViewMenus.reset(sf::FloatRect(0.f, 0.f, (float)mWin->getSize().x, (float)mWin->getSize().y));
+	mViewMenus.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+
+	mViewGE.reset(sf::FloatRect(0, 0, mGE.getLocalSize().x, mGE.getLocalSize().y));
+	mViewGE.setViewport(sf::FloatRect(0, 0, (float)COUNT_TILES_WIDTH / COUNT_TILES_HEIGHT, 1));
+
+	mViewSideBar.reset(
+		sf::FloatRect((float)mWin->getViewport(mViewGE).width, 0,
+		(float)mWin->getSize().x - mWin->getViewport(mViewGE).width, (float)mViewGE.getSize().y));
+
+	mViewSideBar.setViewport(
+		sf::FloatRect(1 - mViewGE.getViewport().width, 0,
+			1, 1));
 }

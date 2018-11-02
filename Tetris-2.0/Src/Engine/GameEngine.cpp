@@ -229,7 +229,6 @@ void GameEngine::onActivePieceHitBottom() {
 		mScore *= mDifficulty;
 	}
 }
-
 void GameEngine::clearCompletedRows(vector<int> &rowsToClear) {
 	mScore += 100 * rowsToClear.size() * rowsToClear.size();
 
@@ -381,7 +380,6 @@ sf::Time GameEngine::computeFrameTime(sf::Time elapsedTotal, int difficulty) {
 	float limFrame = 100.0f;
 
 	double frameTime = limFrame + (limFrame + (15 - difficulty) * 20) * std::exp(-(difficulty + 10) / 2000.0f * elapsedTotal.asSeconds());
-	cout << "Temps computed : " << frameTime << endl;
 	return sf::microseconds((sf::Int64) (1000 * frameTime));
 }
 

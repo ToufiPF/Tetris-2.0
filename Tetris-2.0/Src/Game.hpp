@@ -22,10 +22,8 @@ public:
 		MAIN_MENU = 0, OPTIONS_MENU, PLAYING, PAUSED, GAME_OVER
 	};
 
-	static const unsigned int DEFAULT_WIN_SIZE_X;
-	static const unsigned int DEFAULT_WIN_SIZE_Y;
-	static const float DEFAULT_GAMEENGINE_RATIO_X;
-	static const float DEFAULT_GAMEENGINE_RATIO_Y;
+	static const unsigned int MINIMUM_WIN_SIZE_X;
+	static const unsigned int MINIMUM_WIN_SIZE_Y;
 
 	static const float DEFAULT_BGM_VOLUME;
 	static const float DEFAULT_SFX_VOLUME;
@@ -57,6 +55,11 @@ protected:
 	void processEvents();
 	// Gere les events claviers selon l'etat du jeu
 	void processKeyEvents(const sf::Event &e);
+	// Gere les events resize
+	void processResizeEvent(const sf::Event &e);
+
+	// Redimensionne les vues
+	void resizeViews();
 
 protected:
 	sf::RenderWindow *mWin;
@@ -66,12 +69,13 @@ protected:
 	sf::Music mTetrisTheme;
 
 	GameState mGameState;
+	sf::View mViewMenus;
+	sf::View mViewGE;
+	sf::View mViewSideBar;
 	GameEngine mGE;
 	sf::Clock mClockGame;
 
 	/* ---- Settings ---- */
-	sf::Vector2u mWinSize;
-	sf::Vector2f mGameEngineRatio;
 	float mBgmVolume, mSfxVolume;
 
 	/* ---- Menus ---- */

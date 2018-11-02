@@ -32,6 +32,8 @@ public:
 	unsigned long int getScore() const { return mScore; };
 	bool isGameOver() const { return mIsGameOver; };
 
+	static sf::Vector2f getLocalSize() { return sf::Vector2f(TILE_SIZE * COUNT_TILES_WIDTH, TILE_SIZE * COUNT_TILES_HEIGHT); }
+
 protected:
 	static sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
 	// Donne la couleur au vertexArray
