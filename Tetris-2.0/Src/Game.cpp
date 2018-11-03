@@ -1,6 +1,6 @@
 #include "Game.hpp"
 
-const unsigned int Game::MINIMUM_WIN_SIZE_X = (unsigned int)GameEngine::getLocalSize().x + 150;
+const unsigned int Game::MINIMUM_WIN_SIZE_X = (unsigned int)GameEngine::getLocalSize().x + 200;
 const unsigned int Game::MINIMUM_WIN_SIZE_Y = (unsigned int)GameEngine::getLocalSize().y;
 
 const float Game::DEFAULT_BGM_VOLUME = 100.0f;
@@ -36,37 +36,37 @@ Game::ErrorCode Game::init() {
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 
-	mWin->create(sf::VideoMode(MINIMUM_WIN_SIZE_X, MINIMUM_WIN_SIZE_X), "Tetris 2.0", sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close, settings);
+	mWin->create(sf::VideoMode(MINIMUM_WIN_SIZE_X, MINIMUM_WIN_SIZE_Y), "Tetris 2.0", sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close, settings);
 	mWin->setFramerateLimit(60);
 	mWin->setVerticalSyncEnabled(false);
 	mWin->setKeyRepeatEnabled(true);
 
 	bool settingsRead = readSettings();
 
-	mWin->setPosition(sf::Vector2i(400, 200));
+	mWin->setPosition(sf::Vector2i(400, 150));
 
 	mTetrisTheme.setLoop(true);
 	mTetrisTheme.setVolume(mBgmVolume);
 	mTetrisTheme.play();
 
 	mMainMenu.setFont(mHpFont);
-	mMainMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
+	mMainMenu.setMenuSize(sf::Vector2f((float)MINIMUM_WIN_SIZE_X, (float)MINIMUM_WIN_SIZE_Y));
 	mMainMenu.setSelection(0);
 
 	mOptionsMenu.setFont(mHpFont);
-	mOptionsMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
+	mOptionsMenu.setMenuSize(sf::Vector2f((float)MINIMUM_WIN_SIZE_X, (float)MINIMUM_WIN_SIZE_Y));
 	mOptionsMenu.setSelection(0);
 	mOptionsMenu.setDifficultyValue(mGE.getDifficulty());
 	mOptionsMenu.setBgmVolumeValue(mBgmVolume);
 	mOptionsMenu.setSfxVolumeValue(mSfxVolume);
 
 	mPauseMenu.setFont(mHpFont);
-	mPauseMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x / 1.5f, (float)mWin->getSize().y / 1.5f));
+	mPauseMenu.setMenuSize(sf::Vector2f((float)MINIMUM_WIN_SIZE_X / 1.5f, (float)MINIMUM_WIN_SIZE_Y / 1.5f));
 	mPauseMenu.setSelection(0);
-	mPauseMenu.setPosition(mWin->getSize().x / 6.0f, mWin->getSize().y / 6.0f);
+	mPauseMenu.setPosition(MINIMUM_WIN_SIZE_X / 6.f, MINIMUM_WIN_SIZE_Y / 6.f);
 
 	mGameOverMenu.setFont(mHpFont);
-	mGameOverMenu.setMenuSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
+	mGameOverMenu.setMenuSize(sf::Vector2f((float)MINIMUM_WIN_SIZE_X, (float)MINIMUM_WIN_SIZE_Y));
 	mGameOverMenu.setSelection(0);
 
 	setGameState(GameState::MAIN_MENU);
@@ -83,54 +83,14 @@ void Game::begin() {
 		processEvents();
 
 		sf::Time elapsed = mClockGame.restart();
-		mWin->clear(sf::Color::White);
-
-		sf::RectangleShape fond;
-		// On dessine en fonction du GameState
-		switch (mGameState) {
-		case GameState::MAIN_MENU:
-			mWin->setView(mViewMenus);
-			mWin->draw(mMainMenu);
-			break;
-
-		case GameState::OPTIONS_MENU:
-			mWin->setView(mViewMenus);
-			mWin->draw(mOptionsMenu);
-			break;
-
-		case GameState::PLAYING:
+		if (mGameState == GameState::PLAYING) {
 			mGE.updateGame(elapsed);
-			mWin->setView(mViewGE);
-			mWin->draw(mGE);
-
 			if (mGE.isGameOver())
 				setGameState(GameState::GAME_OVER);
-
-			break;
-
-		case GameState::PAUSED:
-			// Permet de voir le jeu en transparence
-			mWin->setView(mViewGE);
-			mWin->draw(mGE);
-
-			mWin->setView(mViewMenus);
-
-			fond.setSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
-			fond.setFillColor(sf::Color(0, 0, 0, 150));
-			mWin->draw(fond);
-
-			mWin->draw(mPauseMenu);
-
-			break;
-
-		case GameState::GAME_OVER:
-			mWin->setView(mViewMenus);
-			mWin->draw(mGameOverMenu);
-			break;
-		default:
-			break;
 		}
 
+		mWin->clear(sf::Color::White);
+		draw();
 		mWin->display();
 	}
 }
@@ -244,6 +204,49 @@ void Game::setGameState(const GameState &state)
 		break;
 	}
 	mGameState = state;
+}
+
+void Game::draw() {
+	sf::RectangleShape fond;
+	// On dessine en fonction du GameState
+	switch (mGameState) {
+	case GameState::MAIN_MENU:
+		mWin->setView(mViewMenus);
+		mWin->draw(mMainMenu);
+		break;
+
+	case GameState::OPTIONS_MENU:
+		mWin->setView(mViewMenus);
+		mWin->draw(mOptionsMenu);
+		break;
+
+	case GameState::PLAYING:
+		mWin->setView(mViewGE);
+		mWin->draw(mGE);
+		break;
+
+	case GameState::PAUSED:
+		// Permet de voir le jeu en transparence
+		mWin->setView(mViewGE);
+		mWin->draw(mGE);
+
+		mWin->setView(mViewMenus);
+
+		fond.setSize(sf::Vector2f((float)mWin->getSize().x, (float)mWin->getSize().y));
+		fond.setFillColor(sf::Color(0, 0, 0, 150));
+		mWin->draw(fond);
+
+		mWin->draw(mPauseMenu);
+
+		break;
+
+	case GameState::GAME_OVER:
+		mWin->setView(mViewMenus);
+		mWin->draw(mGameOverMenu);
+		break;
+	default:
+		break;
+	}
 }
 
 void Game::processEvents() {
@@ -454,7 +457,6 @@ void Game::processKeyEvents(const sf::Event &e) {
 		}
 	}
 }
-
 void Game::processResizeEvent(const sf::Event &e) {
 	if (e.type != sf::Event::EventType::Resized)
 		return;
@@ -470,12 +472,13 @@ void Game::processResizeEvent(const sf::Event &e) {
 	resizeViews();
 	mClockGame.restart();
 }
+
 void Game::resizeViews() {
-	mViewMenus.reset(sf::FloatRect(0.f, 0.f, (float)mWin->getSize().x, (float)mWin->getSize().y));
+	mViewMenus.reset(sf::FloatRect(0.f, 0.f, (float)MINIMUM_WIN_SIZE_X, (float)MINIMUM_WIN_SIZE_Y));
 	mViewMenus.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
 	mViewGE.reset(sf::FloatRect(0, 0, mGE.getLocalSize().x, mGE.getLocalSize().y));
-	mViewGE.setViewport(sf::FloatRect(0, 0, (float)COUNT_TILES_WIDTH / COUNT_TILES_HEIGHT, 1));
+	mViewGE.setViewport(sf::FloatRect(0, 0, (float)COUNT_TILES_WIDTH / COUNT_TILES_HEIGHT * mWin->getSize().y / mWin->getSize().x, 1));
 
 	mViewSideBar.reset(
 		sf::FloatRect((float)mWin->getViewport(mViewGE).width, 0,

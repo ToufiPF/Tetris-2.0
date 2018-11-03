@@ -51,6 +51,9 @@ protected:
 	// Change l'etat du jeu : mainMenu, optionsMenu, playing, paused, gameOver
 	void setGameState(const GameState &state);
 
+	// Dessine le jeu en fonction du gameState
+	void draw();
+
 	// Gere les events
 	void processEvents();
 	// Gere les events claviers selon l'etat du jeu

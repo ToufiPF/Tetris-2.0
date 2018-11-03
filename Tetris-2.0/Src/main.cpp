@@ -10,9 +10,9 @@ int main()
 
 	switch (game.init()) {
 	case Game::ErrorCode::MISS_SETTINGS_INI:
-		cerr << "Fichier settings.ini manquant, paramêtres de base chargés.";
+		cerr << "Fichier settings.ini manquant, parametres de base charges.";
 	case Game::ErrorCode::NO_ERROR:
-		cout << "Jeu initialisé." << endl;
+		cout << "Jeu initialise." << endl;
 		break;
 
 	case Game::ErrorCode::NULLPTR_WIN:
@@ -25,8 +25,10 @@ int main()
 
 	case Game::ErrorCode::MISS_BLOCK_TEXTURE:
 		cerr << "Texture \"block.png\" manquante !" << endl;
+		return Game::ErrorCode::MISS_BLOCK_TEXTURE;
 
-	default: // (Game::ErrorCode::UNKNOWN)
+	case Game::ErrorCode::UNKNOWN:
+	default:
 		cerr << "Problème à inconnu lors de l'initialisation du moteur du jeu." << endl
 			<< "Essayez de réinstaller le programme." << endl;
 		return Game::ErrorCode::UNKNOWN;

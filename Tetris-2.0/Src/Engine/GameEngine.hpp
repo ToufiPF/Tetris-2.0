@@ -32,10 +32,15 @@ public:
 	unsigned long int getScore() const { return mScore; };
 	bool isGameOver() const { return mIsGameOver; };
 
+	// Retourne la taille du niveau de tetris
 	static sf::Vector2f getLocalSize() { return sf::Vector2f(TILE_SIZE * COUNT_TILES_WIDTH, TILE_SIZE * COUNT_TILES_HEIGHT); }
+	// Calcule le temps d'une frame en fonction du temps ecoule et de la difficulte
+	static sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
 
 protected:
-	static sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
+	// Augmente le score de s * multiplicator * difficulty
+	void increaseScore(unsigned int s, float multiplicator = 1.f);
+
 	// Donne la couleur au vertexArray
 	void paintLevel();
 	// Donne la couleur a la piece active
@@ -44,7 +49,8 @@ protected:
 	// Dessine le vertexArray
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-	void onActivePieceHitBottom();
+	// Appele quand une piece touche le fond
+	void placeActivePieceInTileMap();
 	// Efface les rows fournies, et decale le niveau vers le bas
 	void clearCompletedRows(vector<int> &rowsToClear);
 

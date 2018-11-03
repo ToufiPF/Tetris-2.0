@@ -146,7 +146,7 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 			mActivePiece->move(0, 1);
 		}
 		mInstantDown = false;
-		onActivePieceHitBottom();
+		placeActivePieceInTileMap();
 	}
 	else {
 		if (mStrafeLeft) {
@@ -182,7 +182,7 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 			if (isMoveDownAllowed(mActivePiece))
 				mActivePiece->move(0, 1);
 			else
-				onActivePieceHitBottom();
+				placeActivePieceInTileMap();
 		}
 	}
 
@@ -190,7 +190,11 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 	paintActivePiece();
 }
 
-void GameEngine::onActivePieceHitBottom() {
+void GameEngine::increaseScore(unsigned int s, float multiplicator) {
+	mScore += s * multiplicator * mDifficulty;
+}
+
+void GameEngine::placeActivePieceInTileMap() {
 	vector<sf::Vector2i> tilesBl(mActivePiece->getTilesGlobalCoords());
 
 	std::set<int> listRows;
@@ -216,6 +220,7 @@ void GameEngine::onActivePieceHitBottom() {
 		if (!voidTileFound)
 			rowsToClear.push_back(*it);
 	}
+	increaseScore(100, rowsToClear.size() * rowsToClear.size());
 
 	// on nettoie les lignes completes
 	clearCompletedRows(rowsToClear);
@@ -225,13 +230,10 @@ void GameEngine::onActivePieceHitBottom() {
 		//generateNewBlock renvoie false : c'est game over
 		cout << endl << "FIN DU JEU" << endl;
 		mIsGameOver = true;
-
-		mScore *= mDifficulty;
 	}
+	increaseScore(10);
 }
 void GameEngine::clearCompletedRows(vector<int> &rowsToClear) {
-	mScore += 100 * rowsToClear.size() * rowsToClear.size();
-
 	for (unsigned int i = 0; i < rowsToClear.size(); i++) {
 		// on remplace les lignes inferieures par celles superieures
 		for (int x = 0; x < COUNT_TILES_WIDTH; x++) {
@@ -277,8 +279,6 @@ bool GameEngine::generateNextBlock() {
 	for (unsigned int i = 0; i < mActivePiece->getTilesGlobalCoords().size(); i++)
 		if (mTileMap.at(mActivePiece->getTilesGlobalCoords().at(i).x).at(mActivePiece->getTilesGlobalCoords().at(i).y) != Piece::BlockType::Void)
 			return false;
-
-	mScore += 10;
 	return true;
 }
 
