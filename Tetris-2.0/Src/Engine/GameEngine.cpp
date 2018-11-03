@@ -3,9 +3,6 @@
 GameEngine::GameEngine()
 	: sf::Drawable(), sf::Transformable(), mActivePiece(nullptr), mNextPiece(nullptr)
 {
-	mSize.x = TILE_SIZE * COUNT_TILES_WIDTH;
-	mSize.y = TILE_SIZE * COUNT_TILES_HEIGHT;
-
 	srand((unsigned int)time(nullptr));
 
 	mScore = 0;
@@ -18,6 +15,7 @@ GameEngine::GameEngine()
 }
 GameEngine::~GameEngine() {
 }
+
 bool GameEngine::init(sf::Texture *textureBlock) {
 	if (textureBlock == nullptr)
 		return false;
@@ -190,8 +188,8 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 	paintActivePiece();
 }
 
-void GameEngine::increaseScore(unsigned int s, float multiplicator) {
-	mScore += s * multiplicator * mDifficulty;
+void GameEngine::increaseScore(sf::Uint32 s, float multiplicator) {
+	mScore += (sf::Uint64) s * multiplicator * mDifficulty;
 }
 
 void GameEngine::placeActivePieceInTileMap() {
@@ -220,7 +218,7 @@ void GameEngine::placeActivePieceInTileMap() {
 		if (!voidTileFound)
 			rowsToClear.push_back(*it);
 	}
-	increaseScore(100, rowsToClear.size() * rowsToClear.size());
+	increaseScore(100, (float)rowsToClear.size() * rowsToClear.size());
 
 	// on nettoie les lignes completes
 	clearCompletedRows(rowsToClear);

@@ -136,6 +136,7 @@
   <ItemGroup>
     <ClCompile Include="Src\Engine\GameEngine.cpp" />
     <ClCompile Include="Src\Engine\Piece.cpp" />
+    <ClCompile Include="Src\Engine\SideBar.cpp" />
     <ClCompile Include="Src\Game.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Menus\AbstractMenu.cpp" />
@@ -147,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="Src\Engine\GameEngine.hpp" />
     <ClInclude Include="Src\Engine\Piece.hpp" />
+    <ClInclude Include="Src\Engine\SideBar.hpp" />
     <ClInclude Include="Src\Game.hpp" />
     <ClInclude Include="Src\main.hpp" />
     <ClInclude Include="Src\Menus\AbstractMenu.hpp" />

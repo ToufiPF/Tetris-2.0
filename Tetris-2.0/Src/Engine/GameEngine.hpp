@@ -39,7 +39,7 @@ public:
 
 protected:
 	// Augmente le score de s * multiplicator * difficulty
-	void increaseScore(unsigned int s, float multiplicator = 1.f);
+	void increaseScore(sf::Uint32 s, float multiplicator = 1.f);
 
 	// Donne la couleur au vertexArray
 	void paintLevel();
@@ -66,8 +66,6 @@ protected:
 	void rotateRightIfAllowed(Piece *piece);
 
 protected:
-	sf::Vector2u mSize;
-
 	vector< vector< Piece::BlockType > > mTileMap;
 	sf::VertexArray mVArray;
 	Piece *mActivePiece;
@@ -75,7 +73,7 @@ protected:
 
 	sf::Texture *mTextureBlock;
 
-	unsigned long int mScore;
+	sf::Uint64 mScore;
 	int mDifficulty;
 	sf::Time mFrameTime;
 	sf::Time mElapsedSinceLastFrame;
