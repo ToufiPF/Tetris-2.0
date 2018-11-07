@@ -10,8 +10,7 @@ public:
 	SideBar();
 	~SideBar();
 
-	void setNextPiece(Piece *piece) { mNextPiece = piece; };
-
+	void setNextPiece(Piece *piece);
 	void setFont(sf::Font const& font);
 
 protected:
@@ -22,6 +21,7 @@ protected:
 	sf::RectangleShape mCadreNextPiece;
 	sf::Text mTxtNextPiece;
 	Piece* mNextPiece;
+	sf::VertexArray mNextPieceVArray;
 
 	sf::Text mTxtScore;
 

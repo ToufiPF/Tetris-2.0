@@ -26,80 +26,70 @@ sf::Color Piece::getColorByBlockType(BlockType const& type) {
 Piece::Piece(BlockType const& type)
 	: mPieceType(type)
 {
-	// On definit la taille de la matrice en fonction du type
+	// On construit la piece selon son type
 	switch (mPieceType) {
 	case BlockType::Cube:
-		MATRICE_SIZE = 2;
+		mPosRelativeCentreRot[0] = sf::Vector2i(0, 0);
+		mPosRelativeCentreRot[1] = sf::Vector2i(1, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(0, 1);
+		mPosRelativeCentreRot[3] = sf::Vector2i(1, 1);
+
+		mCentreRotPos.x = 0;
+		mCentreRotPos.y = 0;
 		break;
 	case BlockType::Line:
-		MATRICE_SIZE = 4;
+		mPosRelativeCentreRot[0] = sf::Vector2i(0, -1);
+		mPosRelativeCentreRot[1] = sf::Vector2i(0, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(0, 1);
+		mPosRelativeCentreRot[3] = sf::Vector2i(0, 2);
+
+		mCentreRotPos.x = 0;
+		mCentreRotPos.y = 1;
 		break;
 	case BlockType::T:
-		MATRICE_SIZE = 3;
+		mPosRelativeCentreRot[0] = sf::Vector2i(-1, 0);
+		mPosRelativeCentreRot[1] = sf::Vector2i(0, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(1, 0);
+		mPosRelativeCentreRot[3] = sf::Vector2i(0, 1);
+
+		mCentreRotPos.x = 1;
+		mCentreRotPos.y = 0;
 		break;
 	case BlockType::L:
-		MATRICE_SIZE = 3;
+		mPosRelativeCentreRot[0] = sf::Vector2i(0, -1);
+		mPosRelativeCentreRot[1] = sf::Vector2i(0, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(0, 1);
+		mPosRelativeCentreRot[3] = sf::Vector2i(1, 1);
+
+		mCentreRotPos.x = 0;
+		mCentreRotPos.y = 1;
 		break;
 	case BlockType::ReversedL:
-		MATRICE_SIZE = 3;
+		mPosRelativeCentreRot[0] = sf::Vector2i(1, -1);
+		mPosRelativeCentreRot[1] = sf::Vector2i(1, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(0, 1);
+		mPosRelativeCentreRot[3] = sf::Vector2i(1, 1);
+
+		mCentreRotPos.x = 0;
+		mCentreRotPos.y = 1;
 		break;
 	case BlockType::Stairs:
-		MATRICE_SIZE = 3;
+		mPosRelativeCentreRot[0] = sf::Vector2i(0, 0);
+		mPosRelativeCentreRot[1] = sf::Vector2i(1, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(-1, 1);
+		mPosRelativeCentreRot[3] = sf::Vector2i(0, 1);
+
+		mCentreRotPos.x = 1;
+		mCentreRotPos.y = 0;
 		break;
 	case BlockType::ReversedStairs:
-		MATRICE_SIZE = 3;
-		break;
-	default:
-		break;
-	}
+		mPosRelativeCentreRot[0] = sf::Vector2i(-1, 0);
+		mPosRelativeCentreRot[1] = sf::Vector2i(0, 0);
+		mPosRelativeCentreRot[2] = sf::Vector2i(0, 1);
+		mPosRelativeCentreRot[3] = sf::Vector2i(1, 1);
 
-	mMatrice.resize(MATRICE_SIZE);
-	for (int i = 0; i < MATRICE_SIZE; i++)
-		mMatrice[i].resize(MATRICE_SIZE, BlockType::Void);
-
-	// On dessine les pieces dans la matrice
-	switch (mPieceType) {
-	case BlockType::Cube:
-		mMatrice[0][0] = BlockType::Cube;
-		mMatrice[1][0] = BlockType::Cube;
-		mMatrice[1][1] = BlockType::Cube;
-		mMatrice[0][1] = BlockType::Cube;
-		break;
-	case BlockType::Line:
-		mMatrice[0][0] = BlockType::Line;
-		mMatrice[0][1] = BlockType::Line;
-		mMatrice[0][2] = BlockType::Line;
-		mMatrice[0][3] = BlockType::Line;
-		break;
-	case BlockType::T:
-		mMatrice[0][0] = BlockType::T;
-		mMatrice[1][0] = BlockType::T;
-		mMatrice[2][0] = BlockType::T;
-		mMatrice[1][1] = BlockType::T;
-		break;
-	case BlockType::L:
-		mMatrice[0][0] = BlockType::L;
-		mMatrice[1][0] = BlockType::L;
-		mMatrice[2][0] = BlockType::L;
-		mMatrice[0][1] = BlockType::L;
-		break;
-	case BlockType::ReversedL:
-		mMatrice[0][0] = BlockType::ReversedL;
-		mMatrice[1][0] = BlockType::ReversedL;
-		mMatrice[2][0] = BlockType::ReversedL;
-		mMatrice[2][1] = BlockType::ReversedL;
-		break;
-	case BlockType::Stairs:
-		mMatrice[1][0] = BlockType::Stairs;
-		mMatrice[2][0] = BlockType::Stairs;
-		mMatrice[0][1] = BlockType::Stairs;
-		mMatrice[1][1] = BlockType::Stairs;
-		break;
-	case BlockType::ReversedStairs:
-		mMatrice[0][0] = BlockType::ReversedStairs;
-		mMatrice[1][0] = BlockType::ReversedStairs;
-		mMatrice[1][1] = BlockType::ReversedStairs;
-		mMatrice[2][1] = BlockType::ReversedStairs;
+		mCentreRotPos.x = 1;
+		mCentreRotPos.y = 0;
 		break;
 	default:
 		break;
@@ -109,22 +99,20 @@ Piece::~Piece() {
 }
 
 vector<sf::Vector2i> Piece::getTilesLocalCoords() {
-	std::vector<sf::Vector2i> solidTiles;
-	for (int x = 0; x < MATRICE_SIZE; x++)
-		for (int y = 0; y < MATRICE_SIZE; y++)
-			if (mMatrice[x][y] != BlockType::Void)
-				solidTiles.push_back(sf::Vector2i(x, y));
+	vector<sf::Vector2i> tiles;
+	for (int i = 0; i < COUNT_TILES; ++i)
+		tiles.push_back(mPosRelativeCentreRot[i]);
 
-	return solidTiles;
+	return tiles;
 }
 vector<sf::Vector2i> Piece::getTilesGlobalCoords() {
-	std::vector<sf::Vector2i> solidTiles(getTilesLocalCoords());
-	for (unsigned int i = 0; i < solidTiles.size(); i++) {
-		solidTiles[i].x += mTopLeftPos.x;
-		solidTiles[i].y += mTopLeftPos.y;
+	std::vector<sf::Vector2i> tiles(getTilesLocalCoords());
+	for (unsigned int i = 0; i < tiles.size(); ++i) {
+		tiles[i].x += mTopLeftPos.x + mCentreRotPos.x;
+		tiles[i].y += mTopLeftPos.y + mCentreRotPos.y;
 	}
 
-	return solidTiles;
+	return tiles;
 }
 
 void Piece::setLeftTopPosition(int x, int y) {
@@ -138,24 +126,30 @@ void Piece::move(int x, int y) {
 }
 
 void Piece::rotateLeft() {
-	BlockType buffer[4][4];
+	if (mPieceType == BlockType::Cube)
+		return;
 
-	for (int i = 0; i < MATRICE_SIZE; i++)
-		for (int j = 0; j < MATRICE_SIZE; j++)
-			buffer[MATRICE_SIZE - 1 - i][j] = mMatrice[j][i];
-
-	for (int i = 0; i < MATRICE_SIZE; i++)
-		for (int j = 0; j < MATRICE_SIZE; j++)
-			mMatrice[i][j] = buffer[i][j];
+	// On applique la matrice de rotation
+	// | 0  1|   |x|   | y|
+	// |-1  0| * |y| = |-x|
+	int tmp = 0;
+	for (int i = 0; i < COUNT_TILES; ++i) {
+		tmp = mPosRelativeCentreRot[i].x;
+		mPosRelativeCentreRot[i].x = mPosRelativeCentreRot[i].y;
+		mPosRelativeCentreRot[i].y = -1 * tmp;
+	}
 }
 void Piece::rotateRight() {
-	BlockType buffer[4][4];
+	if (mPieceType == BlockType::Cube)
+		return;
 
-	for (int i = 0; i < MATRICE_SIZE; i++)
-		for (int j = 0; j < MATRICE_SIZE; j++)
-			buffer[j][MATRICE_SIZE - 1 - i] = mMatrice[i][j];
-
-	for (int i = 0; i < MATRICE_SIZE; i++)
-		for (int j = 0; j < MATRICE_SIZE; j++)
-			mMatrice[i][j] = buffer[i][j];
+	// On applique la matrice de rotation
+	// | 0 -1|   |x|   |-y|
+	// | 1  0| * |y| = | x|
+	int tmp = 0;
+	for (int i = 0; i < COUNT_TILES; ++i) {
+		tmp = mPosRelativeCentreRot[i].x;
+		mPosRelativeCentreRot[i].x = -1 * mPosRelativeCentreRot[i].y;
+		mPosRelativeCentreRot[i].y = tmp;
+	}
 }

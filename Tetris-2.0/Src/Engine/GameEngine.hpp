@@ -29,7 +29,7 @@ public:
 	};
 	int getDifficulty() const { return mDifficulty; };
 
-	unsigned long int getScore() const { return mScore; };
+	sf::Uint64 getScore() const { return mScore; };
 	bool isGameOver() const { return mIsGameOver; };
 
 	// Retourne la taille du niveau de tetris

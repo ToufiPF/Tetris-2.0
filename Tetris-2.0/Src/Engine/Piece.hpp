@@ -14,14 +14,16 @@ public:
 	};
 
 	static sf::Color getColorByBlockType(BlockType const& type);
+	static const int COUNT_TILES = 4;
 
 public:
 	Piece(BlockType const& type = BlockType::Cube);
 	~Piece();
 
+	BlockType getBlockType() { return mPieceType; };
+
 	vector<sf::Vector2i> getTilesLocalCoords();
 	vector<sf::Vector2i> getTilesGlobalCoords();
-	BlockType getBlockType() { return mPieceType; };
 
 	void setLeftTopPosition(int x, int y);
 	void move(int x, int y);
@@ -32,9 +34,8 @@ protected:
 	BlockType mPieceType;
 
 	sf::Vector2i mTopLeftPos;
-	vector< vector< BlockType > > mMatrice;
-
-	unsigned short MATRICE_SIZE;
+	sf::Vector2i mCentreRotPos;
+	sf::Vector2i mPosRelativeCentreRot[COUNT_TILES];
 };
 
 #endif

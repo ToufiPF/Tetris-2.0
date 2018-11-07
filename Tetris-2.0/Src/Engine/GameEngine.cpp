@@ -189,7 +189,7 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 }
 
 void GameEngine::increaseScore(sf::Uint32 s, float multiplicator) {
-	mScore += (sf::Uint64) s * multiplicator * mDifficulty;
+	mScore += (sf::Uint64) (s * multiplicator * mDifficulty);
 }
 
 void GameEngine::placeActivePieceInTileMap() {
@@ -271,7 +271,6 @@ bool GameEngine::generateNextBlock() {
 
 	// Puis on cree une nouvelle nextPiece
 	alea = rand() % 7 + 1;
-	cout << alea;
 	mNextPiece = new Piece((Piece::BlockType) alea);
 
 	for (unsigned int i = 0; i < mActivePiece->getTilesGlobalCoords().size(); i++)
@@ -383,24 +382,28 @@ sf::Time GameEngine::computeFrameTime(sf::Time elapsedTotal, int difficulty) {
 
 void GameEngine::paintLevel() {
 	sf::Vertex *ver = nullptr;
+	sf::Color color;
 	for (int x = 0; x < COUNT_TILES_WIDTH; x++) {
 		for (int y = 0; y < COUNT_TILES_HEIGHT; y++) {
 			ver = &mVArray[(x + y * COUNT_TILES_WIDTH) * 4];
-			ver[0].color = Piece::getColorByBlockType(mTileMap.at(x).at(y));
-			ver[1].color = Piece::getColorByBlockType(mTileMap.at(x).at(y));
-			ver[2].color = Piece::getColorByBlockType(mTileMap.at(x).at(y));
-			ver[3].color = Piece::getColorByBlockType(mTileMap.at(x).at(y));
+			color = Piece::getColorByBlockType(mTileMap.at(x).at(y));
+			ver[0].color = color;
+			ver[1].color = color;
+			ver[2].color = color;
+			ver[3].color = color;
 		}
 	}
 }
 void GameEngine::paintActivePiece() {
 	sf::Vertex *ver = nullptr;
+	sf::Color color;
 	for (unsigned int i = 0; i < mActivePiece->getTilesLocalCoords().size(); i++) {
 		ver = &mVArray[(mActivePiece->getTilesGlobalCoords()[i].x + mActivePiece->getTilesGlobalCoords()[i].y * COUNT_TILES_WIDTH) * 4];
-		ver[0].color = Piece::getColorByBlockType(mActivePiece->getBlockType());
-		ver[1].color = Piece::getColorByBlockType(mActivePiece->getBlockType());
-		ver[2].color = Piece::getColorByBlockType(mActivePiece->getBlockType());
-		ver[3].color = Piece::getColorByBlockType(mActivePiece->getBlockType());
+		color = Piece::getColorByBlockType(mActivePiece->getBlockType());
+		ver[0].color = color;
+		ver[1].color = color;
+		ver[2].color = color;
+		ver[3].color = color;
 	}
 }
 
