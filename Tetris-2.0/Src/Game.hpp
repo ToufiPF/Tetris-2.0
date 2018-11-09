@@ -6,6 +6,7 @@
 
 #include "main.hpp"
 #include "Engine/GameEngine.hpp"
+#include "Engine/SideBar.hpp"
 
 #include "Menus/MainMenu.hpp"
 #include "Menus/OptionsMenu.hpp"
@@ -62,7 +63,7 @@ protected:
 	void processResizeEvent(const sf::Event &e);
 
 	// Redimensionne les vues
-	void resizeViews();
+	void resizeViewPorts();
 
 protected:
 	sf::RenderWindow *mWin;
@@ -75,7 +76,9 @@ protected:
 	sf::View mViewMenus;
 	sf::View mViewGE;
 	sf::View mViewSideBar;
+
 	GameEngine mGE;
+	SideBar mSideBar;
 	sf::Clock mClockGame;
 
 	/* ---- Settings ---- */

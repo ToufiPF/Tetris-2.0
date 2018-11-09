@@ -1,7 +1,7 @@
 #include "Game.hpp"
 
-const unsigned int Game::MINIMUM_WIN_SIZE_X = (unsigned int)GameEngine::getLocalSize().x + 200;
-const unsigned int Game::MINIMUM_WIN_SIZE_Y = (unsigned int)GameEngine::getLocalSize().y;
+const unsigned int Game::MINIMUM_WIN_SIZE_X = (unsigned int)(GameEngine::SIZE.x + SideBar::SIZE.x);
+const unsigned int Game::MINIMUM_WIN_SIZE_Y = (unsigned int)GameEngine::SIZE.y;
 
 const float Game::DEFAULT_BGM_VOLUME = 100.0f;
 const float Game::DEFAULT_SFX_VOLUME = 100.0f;
@@ -16,6 +16,10 @@ Game::Game(sf::RenderWindow * window)
 	mWin = window;
 	mBgmVolume = DEFAULT_BGM_VOLUME, mSfxVolume = DEFAULT_SFX_VOLUME;
 	mGE.setDifficulty(DEFAULT_DIFFICULTY);
+
+	mViewMenus.reset(sf::FloatRect(0.f, 0.f, (float)MINIMUM_WIN_SIZE_X, (float)MINIMUM_WIN_SIZE_Y));
+	mViewGE.reset(sf::FloatRect(GameEngine::POSITION, GameEngine::SIZE));
+	mViewSideBar.reset(sf::FloatRect(SideBar::POSITION, SideBar::SIZE));
 }
 Game::~Game() {
 }
@@ -71,6 +75,8 @@ Game::ErrorCode Game::init() {
 
 	setGameState(GameState::MAIN_MENU);
 
+	mSideBar.init(mHpFont, &mBlockTexture);
+
 	if (!settingsRead)
 		return ErrorCode::MISS_SETTINGS_INI;
 	else
@@ -84,12 +90,16 @@ void Game::begin() {
 
 		sf::Time elapsed = mClockGame.restart();
 		if (mGameState == GameState::PLAYING) {
-			mGE.updateGame(elapsed);
+			// retourne vrai, c'est qu'on a changé de tile
+			if (mGE.updateGame(elapsed)) {
+				mSideBar.setNextPieceType(mGE.getNextPieceType());
+				mSideBar.setScore(mGE.getScore());
+			}
 			if (mGE.isGameOver())
 				setGameState(GameState::GAME_OVER);
 		}
 
-		mWin->clear(sf::Color::White);
+		mWin->clear(sf::Color(120, 120, 120));
 		draw();
 		mWin->display();
 	}
@@ -223,12 +233,16 @@ void Game::draw() {
 	case GameState::PLAYING:
 		mWin->setView(mViewGE);
 		mWin->draw(mGE);
+		mWin->setView(mViewSideBar);
+		mWin->draw(mSideBar);
 		break;
 
 	case GameState::PAUSED:
 		// Permet de voir le jeu en transparence
 		mWin->setView(mViewGE);
 		mWin->draw(mGE);
+		mWin->setView(mViewSideBar);
+		mWin->draw(mSideBar);
 
 		mWin->setView(mViewMenus);
 
@@ -469,22 +483,16 @@ void Game::processResizeEvent(const sf::Event &e) {
 		height = MINIMUM_WIN_SIZE_Y;
 
 	mWin->setSize(sf::Vector2u(width, height));
-	resizeViews();
+	resizeViewPorts();
 	mClockGame.restart();
 }
 
-void Game::resizeViews() {
-	mViewMenus.reset(sf::FloatRect(0.f, 0.f, (float)MINIMUM_WIN_SIZE_X, (float)MINIMUM_WIN_SIZE_Y));
+void Game::resizeViewPorts() {
 	mViewMenus.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
-	mViewGE.reset(sf::FloatRect(0, 0, mGE.getLocalSize().x, mGE.getLocalSize().y));
 	mViewGE.setViewport(sf::FloatRect(0, 0, (float)COUNT_TILES_WIDTH / COUNT_TILES_HEIGHT * mWin->getSize().y / mWin->getSize().x, 1));
 
-	mViewSideBar.reset(
-		sf::FloatRect((float)mWin->getViewport(mViewGE).width, 0,
-		(float)mWin->getSize().x - mWin->getViewport(mViewGE).width, (float)mViewGE.getSize().y));
-
 	mViewSideBar.setViewport(
-		sf::FloatRect(1 - mViewGE.getViewport().width, 0,
-			1, 1));
+		sf::FloatRect(mViewGE.getViewport().width, 0,
+			1 - mViewGE.getViewport().width, 1));
 }

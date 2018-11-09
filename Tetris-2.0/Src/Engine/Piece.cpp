@@ -101,15 +101,15 @@ Piece::~Piece() {
 vector<sf::Vector2i> Piece::getTilesLocalCoords() {
 	vector<sf::Vector2i> tiles;
 	for (int i = 0; i < COUNT_TILES; ++i)
-		tiles.push_back(mPosRelativeCentreRot[i]);
+		tiles.push_back(sf::Vector2i(mPosRelativeCentreRot[i].x + mCentreRotPos.x, mPosRelativeCentreRot[i].y + mCentreRotPos.y));
 
 	return tiles;
 }
 vector<sf::Vector2i> Piece::getTilesGlobalCoords() {
 	std::vector<sf::Vector2i> tiles(getTilesLocalCoords());
 	for (unsigned int i = 0; i < tiles.size(); ++i) {
-		tiles[i].x += mTopLeftPos.x + mCentreRotPos.x;
-		tiles[i].y += mTopLeftPos.y + mCentreRotPos.y;
+		tiles[i].x += mTopLeftPos.x;
+		tiles[i].y += mTopLeftPos.y;
 	}
 
 	return tiles;

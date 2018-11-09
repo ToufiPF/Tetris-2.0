@@ -1,9 +1,14 @@
 #include "GameEngine.hpp"
 
+const sf::Vector2f GameEngine::POSITION = sf::Vector2f(0, 0);
+const sf::Vector2f GameEngine::SIZE = sf::Vector2f(TILE_SIZE * COUNT_TILES_WIDTH, TILE_SIZE * COUNT_TILES_HEIGHT);
+
 GameEngine::GameEngine()
 	: sf::Drawable(), sf::Transformable(), mActivePiece(nullptr), mNextPiece(nullptr)
 {
 	srand((unsigned int)time(nullptr));
+
+	setPosition(POSITION);
 
 	mScore = 0;
 	mDifficulty = 1;
@@ -131,10 +136,12 @@ void GameEngine::processKeyEvent(sf::Event const& e) {
 	}
 }
 
-void GameEngine::updateGame(sf::Time const& elapsed) {
+bool GameEngine::updateGame(sf::Time const& elapsed) {
 	// Si il n'y a pas de bloc actif, c'est que l'on a pas commencé le jeu -> on quitte
 	if (mActivePiece == nullptr)
-		return;
+		return false;
+
+	bool piecePlacedInMap = false;
 
 	mElapsedSinceLastFrame += elapsed;
 	mElapsedTotal += elapsed;
@@ -144,6 +151,7 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 			mActivePiece->move(0, 1);
 		}
 		mInstantDown = false;
+		piecePlacedInMap = true;
 		placeActivePieceInTileMap();
 	}
 	else {
@@ -179,13 +187,17 @@ void GameEngine::updateGame(sf::Time const& elapsed) {
 			// On vérifie si on peut descendre
 			if (isMoveDownAllowed(mActivePiece))
 				mActivePiece->move(0, 1);
-			else
+			else {
+				piecePlacedInMap = true;
 				placeActivePieceInTileMap();
+			}
 		}
 	}
 
 	paintLevel();
 	paintActivePiece();
+
+	return piecePlacedInMap;
 }
 
 void GameEngine::increaseScore(sf::Uint32 s, float multiplicator) {
@@ -210,7 +222,7 @@ void GameEngine::placeActivePieceInTileMap() {
 	for (std::set<int>::reverse_iterator it = listRows.rbegin(); it != listRows.rend(); it++) {
 		voidTileFound = false;
 		for (int x = 0; x < COUNT_TILES_WIDTH; x++) {
-			if (mTileMap.at(x).at(*it) == Piece::BlockType::Void) {
+			if (getBlockAt(x, *it) == Piece::BlockType::Void) {
 				voidTileFound = true;
 				break;
 			}
@@ -263,7 +275,6 @@ bool GameEngine::generateNextBlock() {
 	// Sinon, on cree l'active
 	else {
 		alea = rand() % 7 + 1;
-		cout << alea;
 		mActivePiece = new Piece((Piece::BlockType) alea);
 	}
 
@@ -274,8 +285,9 @@ bool GameEngine::generateNextBlock() {
 	mNextPiece = new Piece((Piece::BlockType) alea);
 
 	for (unsigned int i = 0; i < mActivePiece->getTilesGlobalCoords().size(); i++)
-		if (mTileMap.at(mActivePiece->getTilesGlobalCoords().at(i).x).at(mActivePiece->getTilesGlobalCoords().at(i).y) != Piece::BlockType::Void)
+		if (getBlockAt(mActivePiece->getTilesGlobalCoords().at(i).x, mActivePiece->getTilesGlobalCoords().at(i).y) != Piece::BlockType::Void)
 			return false;
+
 	return true;
 }
 
@@ -286,7 +298,7 @@ bool GameEngine::isMoveLeftAllowed(Piece *piece) const {
 		if (tiles.at(i).x <= 0)
 			return false;
 
-		if (mTileMap.at(tiles.at(i).x - 1).at(tiles.at(i).y) != Piece::BlockType::Void)
+		if (getBlockAt(tiles.at(i).x - 1, tiles.at(i).y) != Piece::BlockType::Void)
 			return false;
 	}
 	return true;
@@ -298,7 +310,7 @@ bool GameEngine::isMoveRightAllowed(Piece *piece) const {
 		if (tiles.at(i).x >= COUNT_TILES_WIDTH - 1)
 			return false;
 
-		if (mTileMap.at(tiles.at(i).x + 1).at(tiles.at(i).y) != Piece::BlockType::Void)
+		if (getBlockAt(tiles.at(i).x + 1, tiles.at(i).y) != Piece::BlockType::Void)
 			return false;
 	}
 	return true;
@@ -310,7 +322,7 @@ bool GameEngine::isMoveDownAllowed(Piece *piece) const {
 		if (tiles.at(i).y >= COUNT_TILES_HEIGHT - 1)
 			return false;
 
-		if (mTileMap.at(tiles.at(i).x).at(tiles.at(i).y + 1) != Piece::BlockType::Void)
+		if (getBlockAt(tiles.at(i).x, tiles.at(i).y + 1) != Piece::BlockType::Void)
 			return false;
 	}
 	return true;
@@ -334,7 +346,7 @@ void GameEngine::rotateLeftIfAllowed(Piece *piece) {
 			break;
 		}
 
-		if (mTileMap.at(tilesBl.at(i).x).at(tilesBl.at(i).y) != Piece::BlockType::Void) {
+		if (getBlockAt(tilesBl.at(i).x, tilesBl.at(i).y) != Piece::BlockType::Void) {
 			cancelRot = true;
 			break;
 		}
@@ -362,7 +374,7 @@ void GameEngine::rotateRightIfAllowed(Piece *piece) {
 			break;
 		}
 
-		if (mTileMap.at(tilesBl.at(i).x).at(tilesBl.at(i).y) != Piece::BlockType::Void) {
+		if (getBlockAt(tilesBl.at(i).x, tilesBl.at(i).y) != Piece::BlockType::Void) {
 			cancelRot = true;
 			break;
 		}
@@ -371,6 +383,13 @@ void GameEngine::rotateRightIfAllowed(Piece *piece) {
 		mActivePiece->rotateLeft();
 	else
 		mRotateRight = false;
+}
+
+Piece::BlockType GameEngine::getBlockAt(int x, int y) const {
+	return mTileMap.at(x).at(y);
+}
+Piece::BlockType GameEngine::getBlockAt(sf::Vector2i pos) const {
+	return getBlockAt(pos.x, pos.y);
 }
 
 sf::Time GameEngine::computeFrameTime(sf::Time elapsedTotal, int difficulty) {

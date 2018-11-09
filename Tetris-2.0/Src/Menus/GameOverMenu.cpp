@@ -29,7 +29,7 @@ void GameOverMenu::setFont(sf::Font const& f) {
 	mIntScoreTxt.setFont(f);
 }
 
-void GameOverMenu::setScore(unsigned long score) {
+void GameOverMenu::setScore(sf::Uint64 score) {
 	mIntScoreTxt.setString(std::to_string(score));
 	mIntScoreTxt.setPosition((mMenuFrame.getSize().x - mIntScoreTxt.getGlobalBounds().width) / 2, mYourScoreTxt.getGlobalBounds().top + mYourScoreTxt.getGlobalBounds().height + 20);
 }

@@ -14,7 +14,7 @@ public:
 	void setMenuSize(sf::Vector2f const & size);
 	void setFont(sf::Font const& f);
 
-	void setScore(unsigned long score);
+	void setScore(sf::Uint64 score);
 
 protected:
 	sf::Text mGameOverTxt, mYourScoreTxt, mIntScoreTxt;

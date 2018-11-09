@@ -11,12 +11,19 @@
 class GameEngine : public sf::Drawable, public sf::Transformable
 {
 public:
+	static const sf::Vector2f POSITION;
+	static const sf::Vector2f SIZE;
+
+	// Calcule le temps d'une frame en fonction du temps ecoule et de la difficulte
+	static sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
+public:
 	GameEngine();
 	~GameEngine();
 
 	bool init(sf::Texture *textureBlock);
 
-	void updateGame(sf::Time const& elapsed);
+	// Retourne true si on a place une piece dans la map
+	bool updateGame(sf::Time const& elapsed);
 	void processKeyEvent(sf::Event const& e);
 
 	void setDifficulty(int difficulty) {
@@ -32,10 +39,16 @@ public:
 	sf::Uint64 getScore() const { return mScore; };
 	bool isGameOver() const { return mIsGameOver; };
 
-	// Retourne la taille du niveau de tetris
-	static sf::Vector2f getLocalSize() { return sf::Vector2f(TILE_SIZE * COUNT_TILES_WIDTH, TILE_SIZE * COUNT_TILES_HEIGHT); }
-	// Calcule le temps d'une frame en fonction du temps ecoule et de la difficulte
-	static sf::Time computeFrameTime(sf::Time elapsedTotal, int difficulty);
+	Piece::BlockType getActivePieceType() {
+		if (mActivePiece == nullptr)
+			return Piece::BlockType::Void;
+		return mActivePiece->getBlockType();
+	}
+	Piece::BlockType getNextPieceType() {
+		if (mNextPiece == nullptr)
+			return Piece::BlockType::Void;
+		return mNextPiece->getBlockType();
+	}
 
 protected:
 	// Augmente le score de s * multiplicator * difficulty
@@ -64,6 +77,9 @@ protected:
 
 	void rotateLeftIfAllowed(Piece *piece);
 	void rotateRightIfAllowed(Piece *piece);
+
+	Piece::BlockType getBlockAt(int x, int y) const;
+	Piece::BlockType getBlockAt(sf::Vector2i pos) const;
 
 protected:
 	vector< vector< Piece::BlockType > > mTileMap;
