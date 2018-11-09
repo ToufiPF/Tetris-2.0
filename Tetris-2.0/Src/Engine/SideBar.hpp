@@ -18,6 +18,7 @@ public:
 
 	void setNextPieceType(Piece::BlockType type);
 	void setScore(sf::Uint64 score);
+	void setHighScore(sf::Uint64 score);
 
 protected:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

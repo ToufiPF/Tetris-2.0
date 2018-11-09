@@ -50,10 +50,15 @@ void SideBar::init(sf::Font const& font, sf::Texture* textureBlock) {
 	mTxtHighScore.setFont(font);
 
 	mTextureBlock = textureBlock;
+	setScore(0);
+	setHighScore(0);
 }
 
 void SideBar::setScore(sf::Uint64 score) {
 	mTxtScore.setString("Score : " + std::to_string(score));
+}
+void SideBar::setHighScore(sf::Uint64 hScore) {
+	mTxtHighScore.setString("Meilleur Score : " + std::to_string(hScore));
 }
 
 void SideBar::setNextPieceType(Piece::BlockType type) {
@@ -70,8 +75,6 @@ void SideBar::setNextPieceType(Piece::BlockType type) {
 	sf::Vertex *vertex = nullptr;
 	for (int i = 0; i < Piece::COUNT_TILES; ++i) {
 		vertex = &mNextPieceVArray[i * 4];
-
-		cout << "Next Piece : " << type << ", tile " << i << " : (" << vec.at(i).x << ", " << vec.at(i).y << ")." << endl;
 
 		vertex[0].position = sf::Vector2f((float)vec.at(i).x * TILE_SIZE, (float)vec.at(i).y * TILE_SIZE);
 		vertex[1].position = sf::Vector2f((float)(vec.at(i).x + 1) * TILE_SIZE, (float)vec.at(i).y * TILE_SIZE);

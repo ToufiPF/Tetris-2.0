@@ -75,8 +75,6 @@ Game::ErrorCode Game::init() {
 
 	setGameState(GameState::MAIN_MENU);
 
-	mSideBar.init(mHpFont, &mBlockTexture);
-
 	if (!settingsRead)
 		return ErrorCode::MISS_SETTINGS_INI;
 	else
@@ -150,7 +148,7 @@ bool Game::readSettings() {
 				}
 				else {
 					mWin->setSize(sf::Vector2u(winSizeX, winSizeY));
-					resizeViews();
+					resizeViewPorts();
 				}
 			}
 			else if (buff == "bgmVolume:") {
@@ -201,8 +199,11 @@ void Game::setGameState(const GameState &state)
 		break;
 	case GameState::PLAYING:
 		// Si on vient de lancer le jeu, on reinitiallise le gameEngine
-		if (mGameState == GameState::MAIN_MENU)
+		if (mGameState == GameState::MAIN_MENU) {
 			mGE.init(&mBlockTexture);
+			mSideBar.init(mHpFont, &mBlockTexture);
+			mSideBar.setNextPieceType(mGE.getNextPieceType());
+		}
 		break;
 	case GameState::PAUSED:
 		mPauseMenu.setSelection(0);
