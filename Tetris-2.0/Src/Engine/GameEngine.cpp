@@ -17,6 +17,10 @@ GameEngine::GameEngine()
 	mStrafeLeft = mStrafeRight = false;
 	mRotateLeft = mRotateRight = false;
 	mAccelerateDown = mInstantDown = false;
+
+	mFond.setPosition(0, 0);
+	mFond.setSize(SIZE);
+	mFond.setFillColor(sf::Color(55, 55, 55));
 }
 GameEngine::~GameEngine() {
 }
@@ -428,6 +432,7 @@ void GameEngine::paintActivePiece() {
 
 void GameEngine::draw(sf::RenderTarget & target, sf::RenderStates states) const {
 	states.transform *= getTransform();
+	target.draw(mFond, states);
 	states.texture = mTextureBlock;
 	target.draw(mVArray, states);
 }

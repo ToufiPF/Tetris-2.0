@@ -87,6 +87,8 @@ protected:
 	Piece *mActivePiece;
 	Piece *mNextPiece;
 
+	sf::RectangleShape mFond;
+
 	sf::Texture *mTextureBlock;
 
 	sf::Uint64 mScore;

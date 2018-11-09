@@ -29,6 +29,7 @@ protected:
 	sf::Text mTxtNextPiece;
 
 	Piece* mNextPiece;
+	sf::Vector2f mOffsetPiece;
 	sf::VertexArray mNextPieceVArray;
 	sf::Texture* mTextureBlock;
 

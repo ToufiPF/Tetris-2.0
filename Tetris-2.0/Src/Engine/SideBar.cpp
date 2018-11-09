@@ -10,7 +10,7 @@ SideBar::SideBar()
 
 	mCadreNextPiece.setFillColor(sf::Color(240, 240, 240));
 	mCadreNextPiece.setSize(sf::Vector2f(4 * TILE_SIZE + 5, 4 * TILE_SIZE + 5));
-	mCadreNextPiece.setPosition((SIZE.x - mCadreNextPiece.getSize().x) / 2.f, 20);
+	mCadreNextPiece.setPosition((SIZE.x - mCadreNextPiece.getSize().x) / 2.f, 50);
 
 	sf::Vertex *vertex = nullptr;
 	for (int i = 0; i < Piece::COUNT_TILES; ++i) {
@@ -30,14 +30,14 @@ SideBar::SideBar()
 	mTxtNextPiece.setString("Prochaine Piece :");
 	mTxtNextPiece.setCharacterSize(18);
 	mTxtNextPiece.setFillColor(sf::Color(220, 220, 220));
-	mTxtNextPiece.setPosition(50, mCadreNextPiece.getPosition().y + mCadreNextPiece.getSize().y + 10);
+	mTxtNextPiece.setPosition(50, 10);
 
 	mTxtScore.setString("Score : 0");
 	mTxtScore.setCharacterSize(20);
 	mTxtScore.setFillColor(sf::Color(220, 220, 220));
 	mTxtScore.setPosition(20, SIZE.y * 0.7f);
 
-	mTxtHighScore.setString("Meilleur Score : ");
+	mTxtHighScore.setString("Meilleur Score : 0");
 	mTxtHighScore.setCharacterSize(18);
 	mTxtHighScore.setFillColor(sf::Color(220, 220, 220));
 	mTxtHighScore.setPosition(20, mTxtScore.getPosition().y + 60);
@@ -68,6 +68,33 @@ void SideBar::setNextPieceType(Piece::BlockType type) {
 	if (mNextPiece != nullptr)
 		delete mNextPiece;
 
+	mOffsetPiece = mCadreNextPiece.getPosition();
+
+	switch (type)
+	{
+	case Piece::Cube:
+		mOffsetPiece.x += (mCadreNextPiece.getSize().x - 2 * TILE_SIZE) / 2 + 2.5f;
+		mOffsetPiece.y += (mCadreNextPiece.getSize().y - 2 * TILE_SIZE) / 2 + 2.5f;
+		break;
+	case Piece::Line:
+		mOffsetPiece.x += (mCadreNextPiece.getSize().x - TILE_SIZE) / 2 + 2.5f;
+		mOffsetPiece.y += 2.5f;
+		break;
+	case Piece::L:
+	case Piece::ReversedL:
+		mOffsetPiece.x += (mCadreNextPiece.getSize().x - 2 * TILE_SIZE) / 2 + 2.5f;
+		mOffsetPiece.y += (mCadreNextPiece.getSize().y - 3 * TILE_SIZE) / 2 + 2.5f;
+		break;
+	case Piece::T:
+	case Piece::Stairs:
+	case Piece::ReversedStairs:
+		mOffsetPiece.x += (mCadreNextPiece.getSize().x - 3 * TILE_SIZE) / 2 + 2.5f;
+		mOffsetPiece.y += (mCadreNextPiece.getSize().y - 2 * TILE_SIZE) / 2 + 2.5f;
+		break;
+	default:
+		break;
+	}
+
 	mNextPiece = new Piece(type);
 	sf::Color color = Piece::getColorByBlockType(type);
 	vector<sf::Vector2i> vec(mNextPiece->getTilesLocalCoords());
@@ -96,7 +123,7 @@ void SideBar::draw(sf::RenderTarget & target, sf::RenderStates states) const
 
 	sf::RenderStates stArray(states);
 	sf::Transform tArray;
-	tArray.translate(mCadreNextPiece.getPosition().x + 2.5f, mCadreNextPiece.getPosition().y + 2.5f);
+	tArray.translate(mOffsetPiece);
 	stArray.transform *= tArray;
 	stArray.texture = mTextureBlock;
 	target.draw(mNextPieceVArray, stArray);
